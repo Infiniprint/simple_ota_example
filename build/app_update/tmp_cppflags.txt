@@ -1,0 +1,1 @@
+1 simple_ota v3.2-603-g18c3a194
