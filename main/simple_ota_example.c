@@ -72,12 +72,12 @@ void app_main()
 
     ESP_LOGI(TAG, "Starting OTA example...");
 
-    esp_http_client_config_t config = {
+    esp_http_client_config_t ota_config = {
         .url = CONFIG_FIRMWARE_UPGRADE_URL,
         .cert_pem = (char *)server_cert_pem_start,
         .event_handler = _http_event_handler,
     };
-    esp_err_t ret = esp_https_ota(&config);
+    esp_err_t ret = esp_https_ota(&ota_config);
     if (ret == ESP_OK) {
         esp_restart();
     } else {
@@ -85,17 +85,30 @@ void app_main()
     }
 
 
+    char buffer[100] = {0};
+    ESP_LOGI(TAG, "Starting to get html...");
 
+    esp_http_client_config_t html_config = {
+        .url = "https://whycopper.com:8070/hello.html",
+        .cert_pem = (char *)server_cert_pem_start,
+        .event_handler = _http_event_handler,
+    };
+    esp_http_client_handle_t client = esp_http_client_init(&html_config);
 
-
-
-
-
+    esp_err_t err = esp_http_client_perform(client);
+    if (err == ESP_OK) {
+	ESP_LOGI(TAG, "HTTP GET Status = %d.",
+		 esp_http_client_get_status_code(client));
+        esp_http_client_read_response(client, buffer, 100);
+	ESP_LOGI(TAG, "HTTP read: %s", buffer);
+    } else {
+        ESP_LOGE(TAG, "HTTP GET request failed: %s.", esp_err_to_name(err));
+    }
 
 
 
     while(1) {
-        printf("Hello this is ruth's ota exaxmple. restart to do an ota update.\n");
+        printf("hello.html: %s. restart to do an ota update.\n", buffer);
 	for (int i = 10; i >= 0; i--) {
 	    printf("Message in %d seconds...\n", i);
 	    vTaskDelay(1000 / portTICK_PERIOD_MS);
