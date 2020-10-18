@@ -55,8 +55,21 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
     return ESP_OK;
 }
 
-void simple_ota_example_task(void * pvParameter)
+void app_main()
 {
+    ESP_ERROR_CHECK(nvs_flash_init());
+    ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
+
+    ESP_ERROR_CHECK(example_connect());
+
+
+
+
+
+
+
+
     ESP_LOGI(TAG, "Starting OTA example...");
 
     esp_http_client_config_t config = {
@@ -70,20 +83,17 @@ void simple_ota_example_task(void * pvParameter)
     } else {
         ESP_LOGE(TAG, "Firmware Upgrades Failed");
     }
-    while (1) {
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-}
 
-void app_main()
-{
-    ESP_ERROR_CHECK(nvs_flash_init());
-    ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    ESP_ERROR_CHECK(example_connect());
 
-    xTaskCreate(&simple_ota_example_task, "ota_example_task", 8192, NULL, 5, NULL);
+
+
+
+
+
+
+
+
     while(1) {
         printf("Hello this is ruth's ota exaxmple. restart to do an ota update.\n");
 	for (int i = 10; i >= 0; i--) {
