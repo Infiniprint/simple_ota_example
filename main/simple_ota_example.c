@@ -75,6 +75,28 @@ void simple_ota_example_task(void * pvParameter)
     }
 }
 
+void get_html_task(void * pvParameter)
+{
+    ESP_LOGI(TAG, "RUTH DEBUG starting get html task...");
+    esp_http_client_config_t config = {
+	.url = "https://whycopper.com:8070/hello.html",
+        .cert_pem = (char *)server_cert_pem_start,
+        .event_handler = _http_event_handler,
+    };
+    esp_http_client_handle_t client = esp_http_client_init(&config);
+    esp_err_t err = esp_http_client_perform(client);
+    if (err == ESP_OK) {
+	ESP_LOGI(TAG, "RUTH DEBUG HTTP GET Status = %d, content_length = %d",
+		 esp_http_client_get_status_code(client),
+		 esp_http_client_get_content_length(client));
+    } else {
+	ESP_LOGE(TAG, "RUTH DEBUG HTTP GET request failed: %s", esp_err_to_name(err));
+    }
+    while (1) {
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
+
 void app_main()
 {
     ESP_ERROR_CHECK(nvs_flash_init());
@@ -84,6 +106,9 @@ void app_main()
     ESP_ERROR_CHECK(example_connect());
 
     xTaskCreate(&simple_ota_example_task, "ota_example_task", 8192, NULL, 5, NULL);
+    xTaskCreate(&get_html_task, "get_html_task", 8192, NULL, 5, NULL);
+
+
     while(1) {
         printf("Hello this is ruth's ota exaxmple. restart to do an ota update.\n");
 	for (int i = 10; i >= 0; i--) {
