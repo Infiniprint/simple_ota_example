@@ -1,3 +1,7 @@
+Ruth is building on the ESP FreeRTOS SDK simple_ota_example to get the ESP to be able to do over the air updates and transfer files from the cloud to the printer SD card.
+
+---
+
 # OTA Demo
 
 ## Introduction
